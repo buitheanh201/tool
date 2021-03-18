@@ -46,11 +46,16 @@ module.exports = (env,argv) => {
         ,resolve : {
             extensions : ['.js','.jsx'],
             alias : {
-                '@' : path.join(__dirname,'src')
+                '@' : path.join(__dirname,'src'),
+                'atoms' : path.join(__dirname,'src/components/atoms'),
+                'molecules' : path.join(__dirname,'src/components/molecules'),
+                'templates' : path.join(__dirname,'src/components/templates'),
+                'pages' : path.join(__dirname,'src/components/pages'),
+                'organisms' : path.join(__dirname,'src/components/organisms')
             }
         }
         ,output : {
-            publicPath : '',
+            publicPath : '/',
             path : path.join(__dirname,'build'),
             filename : 'static/js/bundle.[contenthash:4].js',
             environment : {
