@@ -6,6 +6,10 @@ class TeacherAPI {
             const url = '/teacher';
             return axiosClient.post(url,data);
         }
+        findAll(){
+            const url = '/teacher';
+            return axiosClient.get(url);
+        }
 }
 
 
