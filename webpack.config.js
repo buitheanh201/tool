@@ -44,7 +44,7 @@ module.exports = (env,argv) => {
             ]
         }
         ,resolve : {
-            extensions : ['.js','.jsx'],
+            extensions : ['.js','.jsx','.json'],
             alias : {
                 '@' : path.join(__dirname,'src'),
                 'atoms' : path.join(__dirname,'src/components/atoms'),

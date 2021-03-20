@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import SubjectAPI from '@/services/SubjectAPI';
 import SlotAPI from '@/services/SlotAPI';
 import TeacherAPI from './../../../services/TeacherAPI';
-
-import * as yup from 'yup';
-
 function AddTeacher() {
 
     const [subject, setSubject] = useState([]);
@@ -33,10 +30,10 @@ function AddTeacher() {
     const handleSkill = (e,item) => {
         let data = [...newData.skills];
         if(e.target.checked){
-           data.push(item._id);
+           data.push(item.subjectCode);
            setNewData({...newData,skills : data});
         }else{
-            const removeCheckbox = data.filter(itemCheckbox => itemCheckbox !== item._id);
+            const removeCheckbox = data.filter(itemCheckbox => itemCheckbox !== item.subjectCode);
             setNewData({...newData,skills : removeCheckbox})
         }
     }
@@ -87,7 +84,7 @@ function AddTeacher() {
                 {subject.map((item, key) => {
                     return <label onChange = {(e) => handleSkill(e,item)} className='mx-1' key={key}>
                         <input type="checkbox" />
-                        {item.name}
+                        {item.subjectName}
                     </label>
                 })}
             </div>

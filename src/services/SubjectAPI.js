@@ -7,6 +7,11 @@ class SubjectAPI {
         return axiosClient.get(url)
     }
 
+    create(data){
+        const url = '/subject';
+        return axiosClient.post(url,data);
+    }
+
 }
 
 
