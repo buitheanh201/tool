@@ -10,7 +10,7 @@ function StudentPage() {
 
     const [sheet, setSheet] = useState([]);
     const [teacher, setTeacher] = useState([]);
-
+    const [table, setTable] = useState([]);
     const handleFile = async (e) => {
         const file = e.target.files[0];
         // const promise = new Promise((resolve,reject) => {
@@ -144,104 +144,148 @@ function StudentPage() {
 
         //Xếp ca học cho giảng viên 
         const XEP_CA = XEP_GIANG_VIEN.map(field => {
-            const VITRUAL_ARR = [];
+            const VITRUAL_ARR_BLOCK1 = [];
+            const VITRUAL_ARR_BLOCK2 = [];
             field.block_1.forEach((field1, key) => {
                 if (field.block_1[key + 1]) {
                     if (field1.ten_lop === field.block_1[key + 1].ten_lop) {
-                        VITRUAL_ARR.push({ ...field1, ngay_hoc: '2-4-6' });
-                        VITRUAL_ARR.push({ ...field.block_1[key + 1], ngay_hoc: '3-5-7' });
+                        VITRUAL_ARR_BLOCK1.push({ ...field1, ngay_hoc: '2-4-6' });
+                        VITRUAL_ARR_BLOCK1.push({ ...field.block_1[key + 1], ngay_hoc: '3-5-7' });
                         //console.log(field.block_1[key + 1].ngay_hoc);
                     }//14 15 15 16 17
                     else {
-                        // console.log(VITRUAL_ARR[key]);
-                        if (!VITRUAL_ARR[key]) {
+                        // console.log(VITRUAL_ARR_BLOCK1[key]);
+                        if (!VITRUAL_ARR_BLOCK1[key]) {
                             // console.log(key);
-                            // console.log(VITRUAL_ARR);
-                            VITRUAL_ARR.push({ ...field1, ngay_hoc: '2-4-6' });
+                            // console.log(VITRUAL_ARR_BLOCK1);
+                            VITRUAL_ARR_BLOCK1.push({ ...field1, ngay_hoc: '2-4-6' });
                         }
                     }
                 } else {
-                    VITRUAL_ARR.push({ ...field1, ngay_hoc: '2-4-6' });
+                    VITRUAL_ARR_BLOCK1.push({ ...field1, ngay_hoc: '2-4-6' });
                 }
             });
-            return { ...field, block_1: VITRUAL_ARR };
+            field.block_2.forEach((field1, key) => {
+                if (field.block_2[key + 1]) {
+                    if (field1.ten_lop === field.block_2[key + 1].ten_lop) {
+                        VITRUAL_ARR_BLOCK2.push({ ...field1, ngay_hoc: '2-4-6' });
+                        VITRUAL_ARR_BLOCK2.push({ ...field.block_2[key + 1], ngay_hoc: '3-5-7' });
+                        //console.log(field.block_1[key + 1].ngay_hoc);
+                    }//14 15 15 16 17
+                    else {
+                        // console.log(VITRUAL_ARR_BLOCK2[key]);
+                        if (!VITRUAL_ARR_BLOCK2[key]) {
+                            // console.log(key);
+                            // console.log(VITRUAL_ARR_BLOCK2);
+                            VITRUAL_ARR_BLOCK2.push({ ...field1, ngay_hoc: '2-4-6' });
+                        }
+                    }
+                } else {
+                    VITRUAL_ARR_BLOCK2.push({ ...field1, ngay_hoc: '2-4-6' });
+                }
+            });
+            return { ...field, block_1: VITRUAL_ARR_BLOCK1, block_2: VITRUAL_ARR_BLOCK2 };
         });
-        console.log(XEP_CA);
+        // console.log(XEP_CA);
         const NGAY_CHAN = [];
         const NGAY_LE = [];
-        const rooms = MockData.rooms.map(field => {
-            field.slots.forEach(field1 => {
+        const room_block1 = [];
+        const room_block2 = [];
+        const rooms = [...MockData.rooms].map(field => {
+            [...field.slots].forEach(field1 => {
+                let nextSlot_block1 = false;
+                let nextSlot_block2 = false;
+                const block_1 = { ...field1 };
+                const block_2 = { ...field1 };
                 XEP_CA.forEach(field2 => {
                     field2.block_1.forEach(field3 => {
-                        if (field1.class == "") {
-                            // console.log(field3);
-                            if (field3.ngay_hoc.indexOf('2') != -1 || field3.ngay_hoc.indexOf('4') != -1
-                                || field3.ngay_hoc.indexOf('6') != -1) {
-                                if (!field3.ca_hoc) {
-                                    const teacherMatches = teacher.find(field4 => field4._id === field3.id_giang_vien);
-                                    if (Object.keys(teacherMatches).length > 0) {
-                                        const slotMatches = teacherMatches.slots.find(slotField => field1.slotName.indexOf(slotField.slot) != -1);
-                                        if (slotMatches) {
-                                            field3.ca_hoc = slotMatches.slot;
-                                            field1.class = field3.ten_lop;
-                                            field3.phong = field.roomName;
-                                            NGAY_CHAN.push(field3);
+                        if (!nextSlot_block1) {
+                            if (block_1.class == "") {
+                                // console.log(field3);
+                                if (field3.ngay_hoc.indexOf('2') != -1 || field3.ngay_hoc.indexOf('4') != -1
+                                    || field3.ngay_hoc.indexOf('6') != -1) {
+                                    if (!field3.ca_hoc) {
+                                        const teacherMatches = teacher.find(field4 => field4._id === field3.id_giang_vien);
+                                        if (Object.keys(teacherMatches).length > 0) {
+                                            const slotMatches = teacherMatches.slots.find(slotField => field1.slotName.indexOf(slotField.slot) != -1);
+                                            if (slotMatches) {
+                                                field3.ca_hoc = slotMatches.slot;
+                                                block_1.class = field3.ten_lop;
+                                                field3.phong = field.roomName;
+                                                NGAY_CHAN.push(field3);
+                                            } else {
+                                                nextSlot_block1 = true;
+                                            }
                                         }
                                     }
+                                    // console.log(teacherMatches);
                                 }
-                                // console.log(teacherMatches);
                             }
                         }
                         // console.log(field3);
                     });
-                    console.log(field2);
-                })
+                    field2.block_2.forEach(field3 => {
+                        if (!nextSlot_block2) {
+                            if (block_2.class == "") {
+                                // console.log(field3);
+                                if (field3.ngay_hoc.indexOf('2') != -1 || field3.ngay_hoc.indexOf('4') != -1
+                                    || field3.ngay_hoc.indexOf('6') != -1) {
+                                    if (!field3.ca_hoc) {
+                                        const teacherMatches = teacher.find(field4 => field4._id === field3.id_giang_vien);
+                                        if (Object.keys(teacherMatches).length > 0) {
+                                            const slotMatches = teacherMatches.slots.find(slotField => field1.slotName.indexOf(slotField.slot) != -1);
+                                            if (slotMatches) {
+                                                field3.ca_hoc = slotMatches.slot;
+                                                block_2.class = field3.ten_lop;
+                                                field3.phong = field.roomName;
+                                                NGAY_CHAN.push(field3);
+                                            } else {
+                                                nextSlot_block2 = true;
+                                            }
+                                        }
+                                    }
+                                    // console.log(teacherMatches);
+                                }
+                            }
+                        }
+                        // console.log(field3);
+                    });
+                    // console.log(field2);
+                    // console.log(field2);
+                    // console.log(nextSlot);
+                });
+                room_block1.push({ room: field.roomName, block_1 });
+                room_block2.push({ rooms: field.roomName, block_2 });
             })
         })
-        console.log(NGAY_CHAN);
-        // filterData.forEach(item => {
-        //     if (item.giang_vien) {
-        //         nhung_lop_co_giang_vien.push(item);
-        //     }
-        // });
-        //     const day = [1];
-        //     const cac_lop_da_xep = [];
-        //     const cac_lop_chua_xep = [];
-        //     const calc = []
-        //     let lop_co_giang_vien = [...nhung_lop_co_giang_vien];
-        //     for (let i = 0; i < day.length; i++) {
-        //         // console.log(lop_co_giang_vien);
-        //         // console.log(MockData.rooms);
-        //         const dataFilter = [...MockData.rooms].map(room => {
-        //             const slotSort = [...room.slots].map(slotRoom => {
-        //                 const cloneSlotRoom = { ...slotRoom };
-        //                 lop_co_giang_vien.forEach(item => {
-        //                     if (!item.room) {
-        //                         if (cloneSlotRoom.class === "") {
-        //                             item.ca_hoc = slotRoom.slotName;
-        //                             item.room = room.roomName;
-        //                             cloneSlotRoom.class = item.ten_lop;
-        //                             cac_lop_da_xep.push(item);
-        //                         }
-        //                     }
-        //                 });
-        //                 return slotRoom;
-        //             });
-        //             return room;
-        //         });
-        //         const chua_duoc_xep = lop_co_giang_vien.filter(item => !item.room);
-        //         const da_duoc_xep = lop_co_giang_vien.filter(item => item.room);
-        //         if (chua_duoc_xep.length > 0) {
-        //             lop_co_giang_vien = chua_duoc_xep;
-        //             day.push(i + 2);
-        //         }
-        //         calc.push({
-        //             day : i + 1,
-        //             classes : da_duoc_xep
-        //         });
-        //         // console.log(da_duoc_xep);
-        //     }
-        //    console.log(calc);
+        //Kiểm tra xem lớp nào chưa được xếp 
+        XEP_CA.forEach(field => {
+            field.block_1.forEach((field1, key) => {
+                if (field.block_1[key + 1]) {
+                    if (field1.ten_lop === field.block_1[key + 1].ten_lop) {
+                        const ca_le = field.block_1[key + 1];
+                        const giang_vien = teacher.find(field => field._id == ca_le.id_giang_vien);
+                        ca_le.ca_hoc = field1.ca_hoc;
+                        const giang_vien_co_day_duoc_ca_nay_khong =
+                            giang_vien.slots.find(slotField => ca_le.ca_hoc.indexOf(slotField.slot) !== -1);
+                        if (!giang_vien_co_day_duoc_ca_nay_khong) {
+                            const doi_giang_vien = [];
+                            teacher.forEach(field => {
+                                field.slots.forEach(field1 => {
+                                    if (ca_le.ca_hoc === field1.slot) {
+                                        doi_giang_vien.push(field);
+                                    }
+                                })
+                            });
+                            //console.log('Đổi giảng viên lớp ',field1.ten_lop);
+                            ca_le.giang_vien = doi_giang_vien[Math.floor(Math.random() * doi_giang_vien.length)].name;
+                        }
+                    }
+                }
+            })
+        });
+        console.log(XEP_CA);
+        setTable(XEP_CA);
 
     }
 
@@ -258,6 +302,42 @@ function StudentPage() {
             <input onChange={handleFile} type="file" />
             <p></p>
             <button onClick={onSumbit}>Lọc dữ liệu </button>
+            <table id="root" className = 'w-full'>
+                <thead>
+                    <tr>
+                        <td>STT</td>
+                        <td>Tên lớp</td>
+                        <td>Mã môn</td>
+                        <td>Tên môn</td>
+                        <td>Block</td>
+                        <td>Ca học</td>
+                        <td>Giảng viên</td>
+                        <td>Ngành</td>
+                        <td>Phòng</td>
+                        <td>Ngay hoc</td>
+                        <td>Bộ môn</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table.map(field => {
+                        const mergeArr = [...field.block_1,...field.block_2];
+                        return mergeArr.map((field1,key) =>  
+                        <tr key = {key}>
+                            <td>{key}</td>
+                            <td>{field1.ten_lop}</td>
+                            <td>{field1.ma_mon}</td>
+                            <td>{field1.ten_mon}</td>
+                            <td>{field1.block}</td>
+                            <td>{field1.ca_hoc}</td>
+                            <td>{field1.giang_vien}</td>
+                            <td>{field1.nganh}</td>
+                            <td>{field1.ngay_hoc}</td>
+                            <td>{field1.phong}</td>
+                            <td>{field1.bo_mon}</td>
+                        </tr>)
+                    })}
+                </tbody>
+            </table>
         </div>
     );
 }
